@@ -366,15 +366,64 @@ The endpoints data should be saved as the stated in the ```filename``` column. A
 
 The most interesting attributes of this data are probably ```comment```, ```reference_run__reference_run``` (reference run number) and ```problem_names``` (list of problem categories).
 
+### DQM GUI
+
+Plots from the DQM GUI can be retrieved with the ```dqmcrawl``` command line script.
+This script requires a ```runs.txt``` file, containing a list of run numbers and reconstruction types
+Each line of this file should contain one run number and one reconstruction type (e.g. Online, Express, Prompt, ReReco)
+
+This file could look like this:
+
+```
+321012 Express
+321012 Online
+325310 Prompt
+321012 Express
+306631 reReco
+306631 Express
+```
+
+You can generate this file using ```runregcrawl```:
+
+```bash
+runregcrawl --workspace tracker --runs-txt --min 313052 --max 327564
+```
+
+which will output a ```runs.txt``` file containing all runs in the tracker workspace within the specified run number range.
+
+Then you can use this file to download DQM Plots.
+
+First you need the name of the plot that you want to download. One example for this could be ```/Tracking/TrackParameters/GeneralProperties/TrackEtaPhi_ImpactPoint_GenTk```
+Then to download the ```TrackEtaPhi_ImpactPoint_GenTk``` histogram for all runs specified in the ```runs.txt``` file you can do:
+
+```bash
+dqmcrawl example/runs.txt --resource "/Tracking/TrackParameters/GeneralProperties/TrackEtaPhi_ImpactPoint_GenTk"
+```
+
+This will create a new folder called ```TrackEtaPhi_ImpactPoint_GenTk``` containing one json for for each line in the ```runs.txt``` file.
+
+*Note*:
+
+The resource name is a little bit different between the *Online* and the *Offline* Service in the CMS GUI.
+For example, the resource name of the tracking map lacks a "generalTracks" in the name.
+
+Online name:
+
+```/Tracking/TrackParameters/GeneralProperties/TrackEtaPhi_ImpactPoint_GenTk```
+
+Offline name:
+
+```/Tracking/TrackParameters/generalTracks/GeneralProperties/TrackEtaPhi_ImpactPoint_GenTk```
 
 
-### tl;dr
+
+## tl;dr
 
 *aka just tell me what to do*
 
 Download your grid user certificate and then execute following bash commands (this will take a while):
 
-#### Setup 
+### Setup 
 
 ```bash
 python3 -m venv venv
@@ -397,7 +446,7 @@ openssl pkcs12 -nocerts -in myCertificate.p12 -out ~/private/userkey.tmp.pem
 openssl rsa -in ~/private/userkey.tmp.pem -out ~/private/userkey.pem
 ```
 
-#### Get Data
+### Get Data
 
 ```bash
 mkdir -p data
@@ -415,7 +464,7 @@ Login at https://tkdqmdoctor.web.cern.ch/accounts/login/ and then download
  - https://tkdqmdoctor.web.cern.ch/json/runs/ as ```'data/tkdqmdoctor_runs.json```
  - https://tkdqmdoctor.web.cern.ch/json/problem_runs/ as ```'data/tkdqmdoctor_problem_runs.json```
 
-#### Create Pandas Data Frame
+### Create Pandas Data Frame
 
 Shortcut for lazy people (requires the steps above):
 
@@ -425,7 +474,7 @@ from trackerstudies.utils import load_runs
 runs = load_runs()  # First time will take a while, next time is cached
 ```
 
-#### Run principal component analysis
+### Run principal component analysis
 
 ```python
 from trackerstudies.utils import load_runs

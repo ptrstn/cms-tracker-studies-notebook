@@ -154,7 +154,7 @@ A lot of resources at CERN are only accessible with proper authentication.
 Making this process work inside tools can be tedious and will eventually lead to copy-and-pasted code which is often only partially understood.
 Since logging in into websites to get access to any particular data is a common task, a tool or library which takes care of this process would drastically simplify the implementation of new tools.
 ```cernrequests``` was built to make the user think that no authentication is necessary at all.
-Once configured correctly it will look for a grid user certificate ^[CERN Grid User Certificates can be requested at https://ca.cern.ch/ca/] in the ```private``` or ```.globus``` folder of the home directory and handles all authentication and the root certificate validation.
+Once configured correctly it will look for a [grid user certificate](https://ca.cern.ch/ca/) in the ```private``` or ```.globus``` folder of the home directory and handles all authentication and the root certificate validation.
 
 ```python
 import cernrequests
@@ -171,7 +171,9 @@ More information about ```cernrequests``` is available in the dedicated [GitHub 
 
 ### runregcrawlr
 
-```runregcrawlr``` is a tool to download data stored in the CERN CMS Run Registry (Version 3). The underlying API Client to the Run Registry had to be rewritten, to make it Python 3 compatible ^[Python 2 client run registry client available at https://github.com/valdasraps/resthub].
+```runregcrawlr``` is a tool to download data stored in the CERN CMS Run Registry (Version 3). 
+The underlying API Client to the Run Registry had to be rewritten, to make it Python 3 compatible. 
+A Python 2 client run registry client available at https://github.com/valdasraps/resthub.
 
 Internally it communicates to a [RestHub](https://github.com/valdasraps/resthub) Server via SQL queries.
 

@@ -239,7 +239,7 @@ This procedure is illustrated in this figure:
 
 ![DQM dataset name retrieval process](images/dqm_datasets.png)
 
-Having both a session string and the dataset name, one can now retrieve the desired histogram via the ```jsonfairy``` API which follows the following pattern:
+Having both a session string and the dataset name, you can now retrieve the desired histogram via the ```jsonfairy``` API which follows the following pattern:
 
 ```
 https://cmsweb.cern.ch/dqm/offline/jsonfairy/archive/<run_number>/<dataset>/<plot_name>
@@ -315,15 +315,15 @@ I have not yet tested how the data works in the final pandas data frame.
 
 If you want a single run, do this:
 
-```
+```python
 import runreg
 
 runreg.get(run_number=327600)
 ```
 
-If you prefer a non-nested JSON output, use the flat=True parameter.
+If you prefer a non-nested JSON output, use the ```flat=True``` parameter.
 
-```
+```python
 import runreg
 
 runreg.get(run_number=327600, flat=True)
@@ -339,7 +339,7 @@ runreg.get(run_number=[(327596, ">="), (327744, "lte")], name=("%Cosmics%", "lik
 
 Or if you prefer Django like lookup fields:
 
-```
+```python
 import runreg
 
 runreg.get(run_number__gte=327596, run_number__lte=327744, name__like="%Cosmics%")
@@ -365,3 +365,120 @@ There are 3 data endpoints available.
 The endpoints data should be saved as the stated in the ```filename``` column. All 3 json files should be put into the ```data``` folder.
 
 The most interesting attributes of this data are probably ```comment```, ```reference_run__reference_run``` (reference run number) and ```problem_names``` (list of problem categories).
+
+
+
+### tl;dr
+
+*aka just tell me what to do*
+
+Download your grid user certificate and then execute following bash commands (this will take a while):
+
+#### Setup 
+
+```bash
+python3 -m venv venv
+. venv/bin/activate
+pip install git+https://github.com/CMSTrackerDPG/cernrequests
+pip install git+https://github.com/CMSTrackerDPG/runregcrawlr
+pip install git+https://github.com/CMSTrackerDPG/dqmcrawlr
+pip install git+https://github.com/CMSTrackerDPG/wbmcrawlr
+pip install git+https://github.com/CMSTrackerDPG/runregistryclient
+pip install git+https://github.com/ptrstn/cms-tracker-studies
+pip install numpy
+pip install matplotlib
+pip install pandas
+pip install seaborn
+pip install scipy
+pip install scikit-learn
+mkdir -p ~/private
+openssl pkcs12 -clcerts -nokeys -in myCertificate.p12 -out ~/private/usercert.pem
+openssl pkcs12 -nocerts -in myCertificate.p12 -out ~/private/userkey.tmp.pem
+openssl rsa -in ~/private/userkey.tmp.pem -out ~/private/userkey.pem
+```
+
+#### Get Data
+
+```bash
+mkdir -p data
+cd data
+FIRST_RUN_NUMBER=317500 # your first run number
+LAST_RUN_NUMBER=317600  # your last run number
+FIRST_FILL_NUMBER=6762  # your first fill number (based on run)
+LAST_FILL_NUMBER=6769   # your last fill number (based on run)
+source ../tldr.sh       # Warning: This will take a while
+cd ..                   # Go back to your projects root folder
+```
+
+Login at https://tkdqmdoctor.web.cern.ch/accounts/login/ and then download
+
+ - https://tkdqmdoctor.web.cern.ch/json/runs/ as ```'data/tkdqmdoctor_runs.json```
+ - https://tkdqmdoctor.web.cern.ch/json/problem_runs/ as ```'data/tkdqmdoctor_problem_runs.json```
+
+#### Create Pandas Data Frame
+
+Shortcut for lazy people (requires the steps above):
+
+```python
+from trackerstudies.utils import load_runs
+
+runs = load_runs()  # First time will take a while, next time is cached
+```
+
+#### Run principal component analysis
+
+```python
+from trackerstudies.utils import load_runs
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
+import pandas
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Load the pandas dataframe
+runs = load_runs(from_pickle=False)          # First time will take a while
+
+runs = runs.loc[runs.fill__era=="2018B", :]
+runs = runs.loc[runs.reco.isin(['express', 'prompt']), :]
+runs = runs.loc[runs['Hits.Pixel.mean'] > 0, :]
+runs = runs.loc[runs['Hits.Strip.mean'] > 0, :]
+
+runs.reset_index(inplace=True)   # Rest index
+
+# Decide what features you want
+column_names = list(runs) 
+feature_tokens = ['.rms', 'mean']  # Only features for the RMS and mean value of histograms
+my_feature_list = [column 
+    for column in column_names 
+    if any(token in column 
+    for token in feature_tokens)
+    or column in ['recorded_lumi']
+]  # List of feature column names
+
+# Extract feature matrix
+feature_df = runs[my_feature_list].copy()
+feature_df.fillna(0, inplace=True)          # Handle missing values
+feature_df.reset_index(inplace=True)        # Reset Index
+X = feature_df.loc[:, :].values             # Create feature matrix
+
+# Extract labels
+label_column_names = ['run_number', 'fill_number', 'reco', 'fill__era', 'pixel', 'strip', 'tracking', 'bad_reason']
+labels = runs[label_column_names]
+
+# Feature scaling
+X = StandardScaler().fit_transform(X)
+
+## PCA
+number_of_principal_components = 5
+pca = PCA(n_components=number_of_principal_components)
+classifier = pca.fit(X)
+principal_components = classifier.transform(X)
+
+## Create a PCA Dataframe
+pca_df = pandas.DataFrame(principal_components, columns=['pc1','pc2','pc3','pc4','pc5'])
+pca_df = pandas.concat([pca_df, labels], axis=1)
+
+## Plot the PCA DF
+ax = sns.scatterplot(x="pc1", y="pc2", hue="tracking", data=pca_df)
+plt.show()
+```

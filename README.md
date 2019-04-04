@@ -224,6 +224,9 @@ Examples:
 ```wbmcrawlr``` downloads all your desired data in a *flat* format, meaning that there are no nested lists. 
 Additionaly some of the *meta* fields (like integrated luminoist unit) are also included into the dataset.
 
+A detailed description of how to use the new run registry client is available at the dedicated GitHub repository [wbmcrawlr](https://github.com/CMSTrackerDPG/wbmcrawlr)
+
+
 ### dqmcrawlr
 
 ```dqmcrawlr``` provides a command line client, written in python, to download plots from the CMS DQM GUI for any given run.
@@ -261,7 +264,7 @@ The first thing that you want to do is decide which runs you want to study.
 It can either be a list of specific run numbers or (better) a run number range.
 The Runs of the year 2018 have a run number range of ```313052``` to ```327564```.
 
-Now you should create a dedicated folder for all you ```data```.
+Now you should create a dedicated folder for all your ```data```.
 
 ```bash
 mkdir data
@@ -371,8 +374,8 @@ The most interesting attributes of this data are probably ```comment```, ```refe
 ### DQM GUI
 
 Plots from the DQM GUI can be retrieved with the ```dqmcrawl``` command line script.
-This script requires a ```runs.txt``` file, containing a list of run numbers and reconstruction types
-Each line of this file should contain one run number and one reconstruction type (e.g. Online, Express, Prompt, ReReco)
+This script requires a ```runs.txt``` file, containing a list of run numbers and reconstruction types.
+Each line of this file should contain one run number and one reconstruction type (e.g. Online, Express, Prompt, ReReco).
 
 This file could look like this:
 
@@ -395,7 +398,8 @@ which will output a ```runs.txt``` file containing all runs in the tracker works
 
 Then you can use this file to download DQM Plots.
 
-First you need the name of the plot that you want to download. One example for this could be ```/Tracking/TrackParameters/GeneralProperties/TrackEtaPhi_ImpactPoint_GenTk```
+First you need the name of the plot that you want to download. 
+One example for this could be ```/Tracking/TrackParameters/GeneralProperties/TrackEtaPhi_ImpactPoint_GenTk```.
 Then to download the ```TrackEtaPhi_ImpactPoint_GenTk``` histogram for all runs specified in the ```runs.txt``` file you can do:
 
 ```bash
@@ -416,7 +420,6 @@ Online name:
 Offline name:
 
 ```/Tracking/TrackParameters/generalTracks/GeneralProperties/TrackEtaPhi_ImpactPoint_GenTk```
-
 
 
 ## tl;dr

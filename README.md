@@ -175,11 +175,11 @@ More information about ```cernrequests``` is available in the dedicated [GitHub 
 
 Internally it communicates to a [RestHub](https://github.com/valdasraps/resthub) Server via SQL queries.
 
-![Run Registry API communication process](images/runreg.png){width=70%}
+![Run Registry API communication process](images/runreg.png)
 
 The SQL Query first has to be converted into a unique query id, which can then be used (and reused) to get a cached response of the desired data.
 
-The Run Registry has its own API URL (http://vocms00170:2113), which must be accessed via an authenticated request or within the CERN General Purpose Network (GPN).
+The Run Registry has its own API URL (http://vocms00170:2113), which must be accessed within the CERN General Purpose Network (GPN).
 
 A detailed description of how to use the tool is available at the dedicated GitHub repository [runregcrawlr](https://github.com/CMSTrackerDPG/runregcrawlr).
 
@@ -218,6 +218,9 @@ Examples:
 | http://cmsomsapi.cern.ch:8080/api/v1/runs/327564              | Returns Run resource with the run number 327564 in JSON             |
 | http://cmsomsapi.cern.ch:8080/api/v1/runs/327564/fill         | Returns fill information about the Run with the run number 327564   |
 | http://cmsomsapi.cern.ch:8080/api/v1/runs/327564/lumisections | Returns list of lumisections for the Run with the run number 327564 |
+
+```wbmcrawlr``` downloads all your desired data in a *flat* format, meaning that there are no nested lists. 
+Additionaly some of the *meta* fields (like integrated luminoist unit) are also included into the dataset.
 
 ### dqmcrawlr
 

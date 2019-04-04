@@ -403,10 +403,12 @@ One example for this could be ```/Tracking/TrackParameters/GeneralProperties/Tra
 Then to download the ```TrackEtaPhi_ImpactPoint_GenTk``` histogram for all runs specified in the ```runs.txt``` file you can do:
 
 ```bash
-dqmcrawl example/runs.txt --resource "/Tracking/TrackParameters/GeneralProperties/TrackEtaPhi_ImpactPoint_GenTk"
+dqmcrawl runs.txt --resource "/Tracking/TrackParameters/GeneralProperties/TrackEtaPhi_ImpactPoint_GenTk"
 ```
 
 This will create a new folder called ```TrackEtaPhi_ImpactPoint_GenTk``` containing one json for for each line in the ```runs.txt``` file.
+
+If you want to download all histograms from the Quick Collection of the *Tracking*, *Pixel* and *Strip* workspace, then check out the commands at https://github.com/CMSTrackerDPG/dqmcrawlr#quick-collections
 
 *Note*:
 

@@ -462,6 +462,7 @@ FIRST_RUN_NUMBER=317500 # your first run number
 LAST_RUN_NUMBER=317600  # your last run number
 FIRST_FILL_NUMBER=6762  # your first fill number (based on run)
 LAST_FILL_NUMBER=6769   # your last fill number (based on run)
+wget https://raw.githubusercontent.com/ptrstn/cms-tracker-studies-notebook/master/tldr.sh
 source ../tldr.sh       # Warning: This will take a while
 cd ..                   # Go back to your projects root folder
 ```

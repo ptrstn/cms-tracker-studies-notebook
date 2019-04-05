@@ -226,7 +226,6 @@ Additionaly some of the *meta* fields (like integrated luminoist unit) are also 
 
 A detailed description of how to use the new run registry client is available at the dedicated GitHub repository [wbmcrawlr](https://github.com/CMSTrackerDPG/wbmcrawlr)
 
-
 ### dqmcrawlr
 
 ```dqmcrawlr``` provides a command line client, written in python, to download plots from the CMS DQM GUI for any given run.
@@ -424,6 +423,55 @@ Offline name:
 ```/Tracking/TrackParameters/generalTracks/GeneralProperties/TrackEtaPhi_ImpactPoint_GenTk```
 
 
+### Online Monitoring System (OMS)
+
+Data from the OMS can be downloaded using the ```wbmcrawl``` cli script.
+
+The python package ```wbmcrawlr``` can download both from the CMSWBM and the CMSOMS website API. 
+The ```wbmcrawl``` command line script uses only the OMS API.
+
+You can retrieve both runs and fills, but also many other things like lumisections and hltrates.
+
+To download all runs for the year 2018 execute following command:
+
+```bash
+wbmcrawl --runs 313052 327564
+```
+
+Output:
+
+```bash
+Getting runs 313052 - 327564 from CMS OMS
+Total number of runs: 6424
+
+[#################---------------------------------] 33.85% Page 22/65
+```
+
+This will create a file ```oms_runs.json``` containing the list of specified runs.
+
+Analogously LHC fills can be downloaded:
+
+
+```bash
+wbmcrawl --fills 7480 7483
+```
+
+Output:
+
+```bash
+Getting fills 7480 - 7483 from CMS OMS
+Total number of fills: 4
+
+[##################################################] 100.00% Page 1/1
+
+Stored 4 fills in 'oms_fills.json'
+```
+
+This will create a fille ```oms_fills.json```, containing a list of the specified fills.
+
+For more details check out the [GitHub repository](
+A detailed description of how to use the new run registry client is available at the dedicated GitHub repository [wbmcrawlr](https://github.com/CMSTrackerDPG/wbmcrawlr)).
+
 ## tl;dr
 
 *aka just tell me what to do*
@@ -500,7 +548,7 @@ runs = runs.loc[runs.reco.isin(['express', 'prompt']), :]
 runs = runs.loc[runs['Hits.Pixel.mean'] > 0, :]
 runs = runs.loc[runs['Hits.Strip.mean'] > 0, :]
 
-runs.reset_index(inplace=True)   # Rest index
+runs.reset_index(inplace=True)   # Reset index
 
 # Decide what features you want
 column_names = list(runs) 

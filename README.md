@@ -473,6 +473,210 @@ This will create a fille ```oms_fills.json```, containing a list of the specifie
 For more details check out the [GitHub repository](
 A detailed description of how to use the new run registry client is available at the dedicated GitHub repository [wbmcrawlr](https://github.com/CMSTrackerDPG/wbmcrawlr)).
 
+
+
+## Load data
+
+### TkDQMDcotor
+
+Requires:
+
+ - ```data/tkdqmdoctor_runs.json```
+ - ```data/tkdqmdoctor_problem_runs.json```
+
+```python
+from trackerstudies.load import load_tkdqmdoctor_runs, load_tkdqmdoctor_problem_runs
+
+tkdqmdoctor_runs = load_tkdqmdoctor_runs()
+tkdqmdoctor_problem_runs = load_tkdqmdoctor_problem_runs()
+```
+
+### Run Registry
+
+Requires:
+
+ - ```data/tkdqmdoctor_runs.json```
+ - ```data/tkdqmdoctor_problem_runs.json```
+
+```python
+from trackerstudies.load import load_tracker_runs, load_online_tracker_runs
+
+tracker_runs = load_tracker_runs()
+tracker_online_runs = load_online_tracker_runs()
+```
+
+### Online Monitoring System (OMS)
+
+Requires:
+
+ - ```data/oms_runs.json```
+ - ```data/oms_fills.json```
+
+```python
+from trackerstudies.load import load_oms_runs, load_oms_fills
+from trackerstudies.merge import merge_oms_runs_oms_fills
+
+oms_runs = load_oms_runs()
+oms_fills = load_oms_fills()
+oms_runs = merge_oms_runs_oms_fills(oms_runs, oms_fills)
+```
+
+### DQM GUI Histograms
+
+
+Requires:
+
+ - ```data/<histogram_folder>/<run_number>_<reco>.json```
+
+#### Load a specific histogram
+
+To load a specific histogram, in this case ```NumberOfRecHitsPerTrack_GenTk```, do:
+
+```python
+from trackerstudies.load import read_histogram_folder
+
+histograms = read_histogram_folder("NumberOfRecHitsPerTrack_GenTk", attribute_prefix="hits")
+```
+
+```attribute_prefix``` is used as a abbreviation for the feature column name.
+
+This function will extract:
+
+ - rms
+ - mean 
+ - integral
+ - number of entries
+
+If you want the content of a histogram check out the ```load_track_histograms``` function, change your code accordingly. 
+
+#### Load Quick Collection
+
+Requires
+
+ - https://github.com/ptrstn/dqmcrawlr#quick-collections
+
+To load the histograms from the quick collection (PixelPhase1, Strip, Tracking):
+
+```python
+from trackerstudies.load import load_all_histogram_folders
+
+histograms = load_all_histogram_folders()
+```
+
+### Merge all data
+
+```python
+
+from trackerstudies.load import (
+    load_tracker_runs,
+    load_tkdqmdoctor_runs,
+    load_oms_runs,
+    load_tkdqmdoctor_problem_runs,
+    load_all_histogram_folders,
+    load_online_tracker_runs,
+    load_oms_fills
+)
+
+from trackerstudies.merge import (
+    merge_runreg_tkdqmdoc,
+    merge_runreg_oms,
+    merge_runreg_runreg,
+    merge_runreg_tkdqmdoc_problem_runs,
+    merge_runreg_histograms,
+    merge_oms_runs_oms_fills,
+)
+
+tracker_runs = load_tracker_runs()
+tracker_online_runs = load_online_tracker_runs()
+tkdqmdoctor_runs = load_tkdqmdoctor_runs()
+tkdqmdoctor_problem_runs = load_tkdqmdoctor_problem_runs()
+oms_runs = load_oms_runs()
+oms_fills = load_oms_fills()
+oms_runs = merge_oms_runs_oms_fills(oms_runs, oms_fills)
+histograms = load_all_histogram_folders()
+
+
+runs = (
+    tracker_runs.pipe(merge_runreg_runreg, tracker_online_runs)
+    .pipe(merge_runreg_tkdqmdoc, tkdqmdoctor_runs)
+    .pipe(merge_runreg_tkdqmdoc_problem_runs, tkdqmdoctor_problem_runs)
+    .pipe(merge_runreg_oms, oms_runs)
+    .pipe(merge_runreg_histograms, histograms)
+).sort_values(by=["run_number", "reco"])
+```
+
+Addiotionally you can add some extra columns
+
+```python
+from trackerstudies.load import (
+    load_tracker_runs,
+    load_tkdqmdoctor_runs,
+    load_oms_runs,
+    load_tkdqmdoctor_problem_runs,
+    load_all_histogram_folders,
+    load_online_tracker_runs,
+    load_oms_fills
+)
+
+from trackerstudies.merge import (
+    merge_runreg_tkdqmdoc,
+    merge_runreg_oms,
+    merge_runreg_runreg,
+    merge_runreg_tkdqmdoc_problem_runs,
+    merge_runreg_histograms,
+    merge_oms_runs_oms_fills,
+)
+
+from trackerstudies.pipes import (
+    add_runtype,
+    add_is_bad,
+    add_reference_cost,
+    add_is_heavy_ion,
+    add_is_commissioning,
+    add_is_special,
+    add_all_problems,
+    add_status_summary,
+    add_bad_reason,
+)
+
+tracker_runs = load_tracker_runs()
+tracker_online_runs = load_online_tracker_runs()
+tkdqmdoctor_runs = load_tkdqmdoctor_runs()
+tkdqmdoctor_problem_runs = load_tkdqmdoctor_problem_runs()
+oms_runs = load_oms_runs()
+oms_fills = load_oms_fills()
+oms_runs = merge_oms_runs_oms_fills(oms_runs, oms_fills)
+histograms = load_all_histogram_folders()
+
+
+runs = (
+    tracker_runs.pipe(merge_runreg_runreg, tracker_online_runs)
+    .pipe(merge_runreg_tkdqmdoc, tkdqmdoctor_runs)
+    .pipe(merge_runreg_tkdqmdoc_problem_runs, tkdqmdoctor_problem_runs)
+    .pipe(merge_runreg_oms, oms_runs)
+    .pipe(merge_runreg_histograms, histograms)
+    .pipe(add_runtype)
+    .pipe(add_is_special)
+    .pipe(add_is_commissioning)
+    .pipe(exclude_commissioning)
+    .pipe(exclude_special)
+    .pipe(exclude_open)
+    .pipe(add_is_bad)
+    .pipe(add_is_heavy_ion)
+    # .pipe(add_all_problems)
+    .pipe(add_status_summary)
+    .pipe(add_bad_reason)
+).sort_values(by=["run_number", "reco"])
+```
+
+For this exact behaviour there is a shortcut utility function:
+
+```python
+from trackerstudies.utils import load_runs()
+
+runs = load_runs()
+```
+
 ## tl;dr
 
 *aka just tell me what to do*

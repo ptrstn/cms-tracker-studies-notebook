@@ -743,6 +743,7 @@ from sklearn.manifold import TSNE
 from sklearn import svm
 import pandas
 import seaborn as sns
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import numpy
@@ -885,8 +886,18 @@ plt.contourf(xx, yy, Z, levels=[0, Z.max()], colors='palevioletred')
 ## Draw the data points
 b1 = plt.scatter(X_good[:, 0], X_good[:, 1], c='blueviolet', edgecolors='k')
 b2 = plt.scatter(X_bad[:, 0], X_bad[:, 1], c='gold', edgecolors='k')
-plt.title("Support Vector Machine (One Class)")
+plt.title("Support Vector Machine on PCA")
+plt.xlabel("Principal component 1")
+plt.ylabel("Principal component 2")
+
+plt.legend([a.collections[0], b1, b2],
+           ["learned frontier", "good observations",
+            "bad observations"],
+           loc="upper right",
+           prop=matplotlib.font_manager.FontProperties(size=11))
+
 plt.savefig("svm_oneclass.png")
+plt.savefig("svm_oneclass.pdf")
 plt.show()
 
 
@@ -912,8 +923,18 @@ plt.contourf(xx, yy, Z, levels=[0, Z.max()], colors='palevioletred')
 ## Draw the data points
 b1 = plt.scatter(X_good[:, 0], X_good[:, 1], c='blueviolet', edgecolors='k')
 b2 = plt.scatter(X_bad[:, 0], X_bad[:, 1], c='gold', edgecolors='k')
-plt.title("Robust Covariance")
+plt.title("Robust Covariance on PCA")
+plt.xlabel("Principal component 1")
+plt.ylabel("Principal component 2")
+
+plt.legend([a.collections[0], b1, b2],
+           ["learned frontier", "good observations",
+            "bad observations"],
+           loc="upper right",
+           prop=matplotlib.font_manager.FontProperties(size=11))
+
 plt.savefig("robust_covariance.png")
+plt.savefig("robust_covariance.pdf")
 plt.show()
 
 ##################################

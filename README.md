@@ -53,7 +53,7 @@ pip install git+https://github.com/CMSTrackerDPG/runregcrawlr
 pip install git+https://github.com/CMSTrackerDPG/dqmcrawlr
 pip install git+https://github.com/CMSTrackerDPG/wbmcrawlr
 pip install git+https://github.com/CMSTrackerDPG/runregistryclient
-pip install git+https://github.com/ptrstn/cms-tracker-studies
+pip install git+https://github.com/CMSTrackerDPG/cms-tracker-studies
 pip install numpy
 pip install matplotlib
 pip install pandas
